@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"ewallet-framework/internal/models"
 	"fmt"
 	"log"
 
@@ -21,5 +22,7 @@ func SetupMySQL() {
 	}
 
 	logrus.Info("Connected to database")
+
+	DB.AutoMigrate(&models.User{}, &models.UserSession{})
 
 }

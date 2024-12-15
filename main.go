@@ -14,7 +14,7 @@ func main() {
 	helpers.SetupLogger()
 
 	// Load MySQL
-	// helpers.SetupMySQL()
+	helpers.SetupMySQL()
 
 	// Load GRPC
 	go cmd.ServerGRPC()

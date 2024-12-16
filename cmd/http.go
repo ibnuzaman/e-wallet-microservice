@@ -3,6 +3,7 @@ package cmd
 import (
 	"ewallet-framework/helpers"
 	"ewallet-framework/internal/api"
+	"ewallet-framework/internal/repository"
 	"ewallet-framework/internal/services"
 	"log"
 
@@ -15,11 +16,26 @@ func ServerHttp() {
 		HealthcheckServices: healthcheckSvc,
 	}
 
+	regisRepo := &repository.RegisterRepository{
+		DB: helpers.DB,
+	}
+
+	regisSvc := &services.RegisterService{
+		RegisterRepo: regisRepo,
+	}
+
+	regisAPI := &api.RegisterHandler{
+		RegisterService: regisSvc,
+	}
+
 	r := gin.Default()
 
 	r.GET("/health", healthchekcAPI.HealcheckHandlerHTTP)
 
-	err := r.Run(":" + helpers.GetEnv("PORT", "8080"))
+	userV1 := r.Group("/v1/user")
+	userV1.POST("/register", regisAPI.Register)
+
+	err := r.Run(":" + helpers.GetEnv("PORT", ""))
 	if err != nil {
 		log.Fatal(err)
 	}

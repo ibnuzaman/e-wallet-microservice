@@ -10,7 +10,7 @@ import (
 )
 
 func ServerGRPC() {
-	lis, err := net.Listen("tcp", ":"+helpers.GetEnv("GRPC_PORT", "7000"))
+	lis, err := net.Listen("tcp", ":"+helpers.GetEnv("GRPC_PORT", "7001"))
 	if err != nil {
 		log.Fatal("Failed to open grpc port: ", err)
 	}
@@ -20,7 +20,7 @@ func ServerGRPC() {
 	//list method
 	//pb.ExampleMethod(s, &grpc....)
 
-	logrus.Info("GRPC Server running on port: ", helpers.GetEnv("GRPC_PORT", "7000"))
+	logrus.Info("GRPC Server running on port: ", helpers.GetEnv("GRPC_PORT", "7001"))
 
 	if err := s.Serve(lis); err != nil {
 		log.Fatal("Failed to serve", err)

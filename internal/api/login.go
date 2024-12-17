@@ -3,22 +3,21 @@ package api
 import (
 	"ewallet-framework/helpers"
 	"ewallet-framework/internal/constants"
-	"ewallet-framework/internal/interfaces"
 	"ewallet-framework/internal/models"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-type RegisterHandler struct {
-	RegisterService interfaces.IRegisService
+type LoginHandler struct {
 }
 
-func (api *RegisterHandler) Register(c *gin.Context) {
+func (api *LoginHandler) Login(c *gin.Context) {
 	var (
-		log = helpers.Logger
+		log  = helpers.Logger
+		req  = models.LoginRequest{}
+		resp = models.LoginResponse{}
 	)
-	req := models.User{}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Error("Failed to parse request", err)
@@ -32,11 +31,6 @@ func (api *RegisterHandler) Register(c *gin.Context) {
 		return
 	}
 
-	resp, err := api.RegisterService.Register(c.Request.Context(), req)
-	if err != nil {
-		log.Error("Failed to register user", err)
-		helpers.SendResponse(c, http.StatusInternalServerError, constants.ErrServerError, nil)
-		return
-	}
 	helpers.SendResponse(c, http.StatusOK, constants.SuccessMessage, resp)
+
 }

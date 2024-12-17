@@ -9,7 +9,7 @@ import (
 )
 
 type RegisterService struct {
-	RegisterRepo interfaces.IRegisterRepository
+	RegisterRepo interfaces.IUserRepository
 }
 
 func (s *RegisterService) Register(ctx context.Context, request models.User) (interface{}, error) {

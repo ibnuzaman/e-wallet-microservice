@@ -16,7 +16,7 @@ func ServerHttp() {
 		HealthcheckServices: healthcheckSvc,
 	}
 
-	regisRepo := &repository.RegisterRepository{
+	regisRepo := &repository.UserRepository{
 		DB: helpers.DB,
 	}
 

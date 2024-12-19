@@ -29,14 +29,14 @@ func (l User) Validate() error {
 }
 
 type UserSession struct {
-	ID                  uint `gorm:"primary_key"`
+	ID                  int `gorm:"primary_key"`
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
-	UserID              uint   `json:"user_id" gorm:"type:int" validate:"required"`
-	Token               string `json:"token" gorm:"type:varchar(100)" validate:"required"`
-	RefreshToken        string `json:"refresh_token" gorm:"type:varchar(100)" validate:"required"`
-	TokenExpired        string `json:"-" validate:"required"`
-	RefreshTokenExpired string `json:"-" validate:"required"`
+	UserID              int       `json:"user_id" gorm:"type:int" validate:"required"`
+	Token               string    `json:"token" gorm:"type:varchar(512)" validate:"required"`
+	RefreshToken        string    `json:"refresh_token" gorm:"type:varchar(512)" validate:"required"`
+	TokenExpired        time.Time `json:"-" validate:"required"`
+	RefreshTokenExpired time.Time `json:"-" validate:"required"`
 }
 
 func (*UserSession) TableName() string {

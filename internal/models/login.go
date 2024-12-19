@@ -13,7 +13,7 @@ func (l LoginRequest) Validate() error {
 }
 
 type LoginResponse struct {
-	UserID       uint   `json:"user_id"`
+	UserID       int    `json:"user_id"`
 	Username     string `json:"username"`
 	FullName     string `json:"full_name"`
 	Email        string `json:"email"`

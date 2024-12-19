@@ -26,3 +26,7 @@ func (r *UserRepository) GetUserByUsername(ctx context.Context, username string)
 	}
 	return user, nil
 }
+
+func (r *UserRepository) NewInsertNewUser(ctx context.Context, session *models.UserSession) error {
+	return r.DB.Create(session).Error
+}

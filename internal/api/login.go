@@ -3,6 +3,7 @@ package api
 import (
 	"ewallet-framework/helpers"
 	"ewallet-framework/internal/constants"
+	"ewallet-framework/internal/interfaces"
 	"ewallet-framework/internal/models"
 	"net/http"
 
@@ -10,13 +11,14 @@ import (
 )
 
 type LoginHandler struct {
+	LoginService interfaces.ILoginService
 }
 
 func (api *LoginHandler) Login(c *gin.Context) {
 	var (
 		log  = helpers.Logger
-		req  = models.LoginRequest{}
-		resp = models.LoginResponse{}
+		req  models.LoginRequest
+		resp models.LoginResponse
 	)
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -29,6 +31,22 @@ func (api *LoginHandler) Login(c *gin.Context) {
 		log.Error("Failed to validate request", err)
 		helpers.SendResponse(c, http.StatusBadRequest, constants.ErrFailedBadParseRequest, nil)
 		return
+	}
+
+	user, err := api.LoginService.Login(c.Request.Context(), req)
+	if err != nil {
+		log.Error("Internal Server Error ", err)
+		helpers.SendResponse(c, http.StatusInternalServerError, constants.ErrServerError, nil)
+		return
+	}
+
+	resp = models.LoginResponse{
+		UserID:       user.UserID,
+		Username:     user.Username,
+		Email:        user.Email,
+		FullName:     user.FullName,
+		Token:        user.Token,
+		RefreshToken: user.RefreshToken,
 	}
 
 	helpers.SendResponse(c, http.StatusOK, constants.SuccessMessage, resp)

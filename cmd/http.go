@@ -11,33 +11,63 @@ import (
 )
 
 func ServerHttp() {
+
+	// healthchekcAPI := dependencyInject().HealthchekAPI
+	// regisAPI := dependencyInject().RegisterAPI
+
+	dependency := dependencyInject()
+
+	r := gin.Default()
+
+	r.GET("/health", dependency.HealthchekAPI.HealcheckHandlerHTTP)
+
+	userV1 := r.Group("/v1/user")
+	userV1.POST("/register", dependency.RegisterAPI.Register)
+	userV1.POST("/login", dependency.LoginAPI.Login)
+
+	err := r.Run(":" + helpers.GetEnv("PORT", ""))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+}
+
+type Dependency struct {
+	HealthchekAPI *api.Healthcheck
+	RegisterAPI   *api.RegisterHandler
+	LoginAPI      *api.LoginHandler
+}
+
+func dependencyInject() Dependency {
 	healthcheckSvc := &services.Healthcheck{}
 	healthchekcAPI := &api.Healthcheck{
 		HealthcheckServices: healthcheckSvc,
 	}
 
-	regisRepo := &repository.UserRepository{
+	userRepo := &repository.UserRepository{
 		DB: helpers.DB,
 	}
 
 	regisSvc := &services.RegisterService{
-		RegisterRepo: regisRepo,
+		RegisterRepo: userRepo,
 	}
 
 	regisAPI := &api.RegisterHandler{
 		RegisterService: regisSvc,
 	}
 
-	r := gin.Default()
+	loginSvc := &services.LoginService{
+		UserRepo: userRepo,
+	}
 
-	r.GET("/health", healthchekcAPI.HealcheckHandlerHTTP)
+	loginAPI := &api.LoginHandler{
+		LoginService: loginSvc,
+	}
 
-	userV1 := r.Group("/v1/user")
-	userV1.POST("/register", regisAPI.Register)
-
-	err := r.Run(":" + helpers.GetEnv("PORT", ""))
-	if err != nil {
-		log.Fatal(err)
+	return Dependency{
+		HealthchekAPI: healthchekcAPI,
+		RegisterAPI:   regisAPI,
+		LoginAPI:      loginAPI,
 	}
 
 }

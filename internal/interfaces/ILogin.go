@@ -6,5 +6,5 @@ import (
 )
 
 type ILoginService interface {
-	GetUserByUsername(ctx context.Context, req models.LoginRequest) (models.User, error)
+	Login(ctx context.Context, req models.LoginRequest) (models.LoginResponse, error)
 }

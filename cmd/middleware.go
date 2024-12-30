@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func MiddlewareValidateAuth(c *gin.Context, dependency Dependency) {
+func (d *Dependency) MiddlewareValidateAuth(c *gin.Context) {
 
 	auth := c.Request.Header.Get("Authorization")
 	if auth == "" {
@@ -18,7 +18,7 @@ func MiddlewareValidateAuth(c *gin.Context, dependency Dependency) {
 		return
 	}
 
-	_, err := dependency.UserRepository.GetUserSessionByToken(c.Request.Context(), auth)
+	_, err := d.UserRepository.GetUserSessionByToken(c.Request.Context(), auth)
 	if err != nil {
 		log.Println("failed to get user session on DB: ", err)
 		helpers.SendResponse(c, http.StatusUnauthorized, "unauthorized", nil)

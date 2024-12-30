@@ -12,6 +12,20 @@ type UserRepository struct {
 }
 
 func (r *UserRepository) InsertNewUser(ctx context.Context, user *models.User) error {
+	// if err := r.DB.Where("email = ?", user.Email).First(&models.User{}).Error; err == nil {
+	// 	return constants.ErrEmailorUsernameAlreadyExist
+	// }
+
+	// if err := r.DB.Where("username = ?", user.Username).First(&models.User{}).Error; err == nil {
+	// 	return constants.ErrUsernameAlreadyExist
+	// }
+	// var (
+	// 	ErrEmailorUsernameAlreadyExist = errors.New("Email or username already exist")
+	// )
+	// if err := r.DB.Where("email = ?", user.Email).First(&models.User{}).Error; err == nil {
+	// 	return ErrEmailorUsernameAlreadyExist
+	// }
+
 	return r.DB.Create(user).Error
 }
 

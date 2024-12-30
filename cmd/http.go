@@ -22,6 +22,7 @@ func ServerHttp() {
 	userV1 := r.Group("/v1/user")
 	userV1.POST("/register", dependency.RegisterAPI.Register)
 	userV1.POST("/login", dependency.LoginAPI.Login)
+	userV1.DELETE("/logout", dependency.MiddlewareValidateAuth, dependency.LogoutAPI.Logout)
 
 	err := r.Run(":" + helpers.GetEnv("PORT", ""))
 	if err != nil {
@@ -35,6 +36,7 @@ type Dependency struct {
 	HealthchekAPI  interfaces.IHealthcheckHandler
 	RegisterAPI    interfaces.IRegisHandler
 	LoginAPI       interfaces.ILoginHandler
+	LogoutAPI      interfaces.ILogoutHandler
 }
 
 func dependencyInject() Dependency {
@@ -63,10 +65,19 @@ func dependencyInject() Dependency {
 		LoginService: loginSvc,
 	}
 
+	logoutSvc := &services.LogoutService{
+		UserRepo: userRepo,
+	}
+
+	logoutAPI := &api.LogoutHandler{
+		LogoutService: logoutSvc,
+	}
+
 	return Dependency{
 		HealthchekAPI: healthchekcAPI,
 		RegisterAPI:   regisAPI,
 		LoginAPI:      loginAPI,
+		LogoutAPI:     logoutAPI,
 	}
 
 }

@@ -35,7 +35,7 @@ func (api *RegisterHandler) Register(c *gin.Context) {
 	resp, err := api.RegisterService.Register(c.Request.Context(), req)
 	if err != nil {
 		log.Error("Failed to register user", err)
-		helpers.SendResponse(c, http.StatusInternalServerError, constants.ErrServerError, nil)
+		helpers.SendResponse(c, http.StatusInternalServerError, constants.ErrEmailorUsernameAlreadyExist, nil)
 		return
 	}
 	helpers.SendResponse(c, http.StatusOK, constants.SuccessMessage, resp)

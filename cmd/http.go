@@ -3,6 +3,7 @@ package cmd
 import (
 	"ewallet-framework/helpers"
 	"ewallet-framework/internal/api"
+	"ewallet-framework/internal/interfaces"
 	"ewallet-framework/internal/repository"
 	"ewallet-framework/internal/services"
 	"log"
@@ -11,9 +12,6 @@ import (
 )
 
 func ServerHttp() {
-
-	// healthchekcAPI := dependencyInject().HealthchekAPI
-	// regisAPI := dependencyInject().RegisterAPI
 
 	dependency := dependencyInject()
 
@@ -33,9 +31,10 @@ func ServerHttp() {
 }
 
 type Dependency struct {
-	HealthchekAPI *api.Healthcheck
-	RegisterAPI   *api.RegisterHandler
-	LoginAPI      *api.LoginHandler
+	UserRepository interfaces.IUserRepository
+	HealthchekAPI  interfaces.IHealthcheckHandler
+	RegisterAPI    interfaces.IRegisHandler
+	LoginAPI       interfaces.ILoginHandler
 }
 
 func dependencyInject() Dependency {

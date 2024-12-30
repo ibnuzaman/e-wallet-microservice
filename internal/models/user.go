@@ -8,8 +8,8 @@ import (
 
 type User struct {
 	ID          int    `json:"id"`
-	Username    string `json:"username" gorm:"column:username;type:varchar(20)" validate:"required"`
-	Email       string `json:"email" gorm:"column:email;type:varchar(100)" validate:"required,email"`
+	Username    string `json:"username" gorm:"column:username;type:varchar(20);unique" validate:"required"`
+	Email       string `json:"email" gorm:"column:email;type:varchar(100);unique" validate:"required,email"`
 	PhoneNumber string `json:"phone_number" gorm:"column:phone_number;type:varchar(15)" validate:"required"`
 	FullName    string `json:"full_name" gorm:"column:full_name;type:varchar(100)"`
 	Address     string `json:"address" gorm:"column:address;type:text"`

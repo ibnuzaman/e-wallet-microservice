@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 type RegisterHandler struct {
@@ -15,20 +16,26 @@ type RegisterHandler struct {
 }
 
 func (api *RegisterHandler) Register(c *gin.Context) {
+	validate := validator.New()
 	var (
 		log = helpers.Logger
 	)
 	req := models.User{}
-
 	if err := c.ShouldBindJSON(&req); err != nil {
-		log.Error("Failed to parse request", err)
+		log.Error("Failed to bind JSON", err)
 		helpers.SendResponseHTTP(c, http.StatusBadRequest, constants.ErrFailedBadParseRequest, nil)
 		return
 	}
+	if err := validate.Struct(&req); err != nil {
 
-	if err := req.Validate(); err != nil {
-		log.Error("Failed to validate request", err)
-		helpers.SendResponseHTTP(c, http.StatusBadRequest, constants.ErrFailedBadParseRequest, nil)
+		var validationErrors []string
+		for _, err := range err.(validator.ValidationErrors) {
+
+			validationErrors = append(validationErrors, err.Field()+" is "+err.Tag())
+		}
+
+		log.Error("Validation failed", err)
+		helpers.SendResponseHTTP(c, http.StatusBadRequest, constants.ErrFailedBadParseRequest, validationErrors)
 		return
 	}
 

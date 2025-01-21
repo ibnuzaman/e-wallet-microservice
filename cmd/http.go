@@ -22,8 +22,10 @@ func ServerHttp() {
 	userV1 := r.Group("/v1/user")
 	userV1.POST("/register", dependency.RegisterAPI.Register)
 	userV1.POST("/login", dependency.LoginAPI.Login)
-	userV1.DELETE("/logout", dependency.MiddlewareValidateAuth, dependency.LogoutAPI.Logout)
-	userV1.POST("/refresh-token", dependency.MiddlewareValidateAuth, dependency.RefreshTokenAPI.RefreshToken)
+
+	userV1withAuth := userV1.Use()
+	userV1withAuth.DELETE("/logout", dependency.MiddlewareValidateAuth, dependency.LogoutAPI.Logout)
+	userV1withAuth.POST("/refresh-token", dependency.MiddlewareValidateAuth, dependency.RefreshTokenAPI.RefreshToken)
 
 	err := r.Run(":" + helpers.GetEnv("PORT", ""))
 	if err != nil {

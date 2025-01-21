@@ -23,20 +23,20 @@ func (api *LoginHandler) Login(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Error("Failed to parse request", err)
-		helpers.SendResponse(c, http.StatusBadRequest, constants.ErrFailedBadParseRequest, nil)
+		helpers.SendResponseHTTP(c, http.StatusBadRequest, constants.ErrFailedBadParseRequest, nil)
 		return
 	}
 
 	if err := req.Validate(); err != nil {
 		log.Error("Failed to validate request", err)
-		helpers.SendResponse(c, http.StatusBadRequest, constants.ErrFailedBadParseRequest, nil)
+		helpers.SendResponseHTTP(c, http.StatusBadRequest, constants.ErrFailedBadParseRequest, nil)
 		return
 	}
 
 	user, err := api.LoginService.Login(c.Request.Context(), req)
 	if err != nil {
 		log.Error("Internal Server Error ", err)
-		helpers.SendResponse(c, http.StatusInternalServerError, constants.ErrServerError, nil)
+		helpers.SendResponseHTTP(c, http.StatusInternalServerError, constants.ErrServerError, nil)
 		return
 	}
 
@@ -49,6 +49,6 @@ func (api *LoginHandler) Login(c *gin.Context) {
 		RefreshToken: user.RefreshToken,
 	}
 
-	helpers.SendResponse(c, http.StatusOK, constants.SuccessMessage, resp)
+	helpers.SendResponseHTTP(c, http.StatusOK, constants.SuccessMessage, resp)
 
 }

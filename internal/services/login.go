@@ -18,45 +18,45 @@ type LoginService struct {
 
 func (s *LoginService) Login(ctx context.Context, req models.LoginRequest) (models.LoginResponse, error) {
 	var (
-		resp models.LoginResponse
-		now  = time.Now()
+		response models.LoginResponse
+		now      = time.Now()
 	)
 	userDetail, err := s.UserRepo.GetUserByUsername(ctx, req.Username)
 	if err != nil {
-		return resp, errors.Wrap(err, "error while getting user by username")
+		return response, errors.Wrap(err, "error while getting user by username")
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(userDetail.Password), []byte(req.Password)); err != nil {
-		return resp, errors.Wrap(err, "invalid password")
+		return response, errors.Wrap(err, "invalid password")
 	}
 
-	token, err := helpers.GenerateToken(ctx, userDetail.ID, userDetail.Username, userDetail.FullName, "jwt", now)
+	token, err := helpers.GenerateToken(ctx, userDetail.ID, userDetail.Username, userDetail.FullName, "token", userDetail.Email, now)
 	if err != nil {
-		return resp, errors.Wrap(err, "error while generating token")
+		return response, errors.Wrap(err, "failed to generate token")
 	}
 
-	refreshToken, err := helpers.GenerateToken(ctx, userDetail.ID, userDetail.Username, userDetail.FullName, "jwt", now)
+	refreshToken, err := helpers.GenerateToken(ctx, userDetail.ID, userDetail.Username, userDetail.FullName, "refresh_token", userDetail.Email, now)
 	if err != nil {
-		return resp, errors.Wrap(err, "error while generating token")
+		return response, errors.Wrap(err, "failed to generate refresh token")
 	}
 
-	userSession := models.UserSession{
+	userSession := &models.UserSession{
 		UserID:              userDetail.ID,
 		Token:               token,
 		RefreshToken:        refreshToken,
 		TokenExpired:        now.Add(helpers.MapTypeToken["token"]),
 		RefreshTokenExpired: now.Add(helpers.MapTypeToken["refresh_token"]),
 	}
-	err = s.UserRepo.NewInsertNewUser(ctx, &userSession)
+	err = s.UserRepo.InsertNewUserSession(ctx, userSession)
 	if err != nil {
-		return resp, errors.Wrap(err, "error while inserting new user")
+		return response, errors.Wrap(err, "error while inserting new user")
 	}
 
-	resp.UserID = userDetail.ID
-	resp.Username = userDetail.Username
-	resp.FullName = userDetail.FullName
-	resp.Email = userDetail.Email
-	resp.Token = token
-	resp.RefreshToken = refreshToken
+	response.UserID = userDetail.ID
+	response.Username = userDetail.Username
+	response.FullName = userDetail.FullName
+	response.Email = userDetail.Email
+	response.Token = token
+	response.RefreshToken = refreshToken
 
-	return resp, nil
+	return response, nil
 }

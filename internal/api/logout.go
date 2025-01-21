@@ -23,9 +23,9 @@ func (api *LogoutHandler) Logout(c *gin.Context) {
 	err := api.LogoutService.Logout(c.Request.Context(), token)
 	if err != nil {
 		log.Error("Internal Server Error ", err)
-		helpers.SendResponse(c, http.StatusInternalServerError, constants.ErrServerError, nil)
+		helpers.SendResponseHTTP(c, http.StatusInternalServerError, constants.ErrServerError, nil)
 		return
 	}
 
-	helpers.SendResponse(c, http.StatusOK, constants.SuccessMessage, nil)
+	helpers.SendResponseHTTP(c, http.StatusOK, constants.SuccessMessage, nil)
 }

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"ewallet-framework/internal/models"
 
 	"gorm.io/gorm"
@@ -12,19 +13,12 @@ type UserRepository struct {
 }
 
 func (r *UserRepository) InsertNewUser(ctx context.Context, user *models.User) error {
-	// if err := r.DB.Where("email = ?", user.Email).First(&models.User{}).Error; err == nil {
-	// 	return constants.ErrEmailorUsernameAlreadyExist
-	// }
-
-	// if err := r.DB.Where("username = ?", user.Username).First(&models.User{}).Error; err == nil {
-	// 	return constants.ErrUsernameAlreadyExist
-	// }
-	// var (
-	// 	ErrEmailorUsernameAlreadyExist = errors.New("Email or username already exist")
-	// )
-	// if err := r.DB.Where("email = ?", user.Email).First(&models.User{}).Error; err == nil {
-	// 	return ErrEmailorUsernameAlreadyExist
-	// }
+	var (
+		ErrEmailorUsernameAlreadyExist = errors.New("email or username already exist")
+	)
+	if err := r.DB.Where("email = ? OR username = ?", user.Email, user.Username).First(&models.User{}).Error; err == nil {
+		return ErrEmailorUsernameAlreadyExist
+	}
 
 	return r.DB.Create(user).Error
 }
@@ -41,7 +35,7 @@ func (r *UserRepository) GetUserByUsername(ctx context.Context, username string)
 	return user, nil
 }
 
-func (r *UserRepository) NewInsertNewUser(ctx context.Context, session *models.UserSession) error {
+func (r *UserRepository) InsertNewUserSession(ctx context.Context, session *models.UserSession) error {
 	return r.DB.Create(session).Error
 }
 
@@ -57,6 +51,9 @@ func (r *UserRepository) GetUserSessionByToken(ctx context.Context, token string
 	err = r.DB.Where("token = ?", token).First(&session).Error
 	if err != nil {
 		return session, err
+	}
+	if session.ID == 0 {
+		return session, errors.New("session not found")
 	}
 	return session, nil
 }

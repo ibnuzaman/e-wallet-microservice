@@ -33,10 +33,11 @@ func ServerHttp() {
 
 type Dependency struct {
 	UserRepository interfaces.IUserRepository
-	HealthchekAPI  interfaces.IHealthcheckHandler
-	RegisterAPI    interfaces.IRegisHandler
-	LoginAPI       interfaces.ILoginHandler
-	LogoutAPI      interfaces.ILogoutHandler
+
+	HealthchekAPI interfaces.IHealthcheckHandler
+	RegisterAPI   interfaces.IRegisHandler
+	LoginAPI      interfaces.ILoginHandler
+	LogoutAPI     interfaces.ILogoutHandler
 }
 
 func dependencyInject() Dependency {
@@ -74,10 +75,11 @@ func dependencyInject() Dependency {
 	}
 
 	return Dependency{
-		HealthchekAPI: healthchekcAPI,
-		RegisterAPI:   regisAPI,
-		LoginAPI:      loginAPI,
-		LogoutAPI:     logoutAPI,
+		UserRepository: userRepo,
+		HealthchekAPI:  healthchekcAPI,
+		RegisterAPI:    regisAPI,
+		LoginAPI:       loginAPI,
+		LogoutAPI:      logoutAPI,
 	}
 
 }

@@ -9,33 +9,39 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (d *Dependency) MiddlewareValidateAuth(c *gin.Context) {
-
-	auth := c.Request.Header.Get("Authorization")
+func (d *Dependency) MiddlewareValidateAuth(ctx *gin.Context) {
+	auth := ctx.Request.Header.Get("Authorization")
 	if auth == "" {
 		log.Println("authorization empty")
-		helpers.SendResponse(c, http.StatusUnauthorized, "unauthorized", nil)
+		helpers.SendResponseHTTP(ctx, http.StatusUnauthorized, "unauthorized", nil)
+		ctx.Abort()
 		return
 	}
 
-	_, err := d.UserRepository.GetUserSessionByToken(c.Request.Context(), auth)
+	_, err := d.UserRepository.GetUserSessionByToken(ctx.Request.Context(), auth)
 	if err != nil {
 		log.Println("failed to get user session on DB: ", err)
-		helpers.SendResponse(c, http.StatusUnauthorized, "unauthorized", nil)
+		helpers.SendResponseHTTP(ctx, http.StatusUnauthorized, "unauthorized", nil)
+		ctx.Abort()
+		return
 	}
 
-	claim, err := helpers.ValidateToken(c.Request.Context(), auth)
+	claim, err := helpers.ValidateToken(ctx.Request.Context(), auth)
 	if err != nil {
 		log.Println(err)
-		helpers.SendResponse(c, http.StatusUnauthorized, "unauthorized", nil)
+		helpers.SendResponseHTTP(ctx, http.StatusUnauthorized, "unauthorized", nil)
+		ctx.Abort()
+		return
 	}
 
 	if time.Now().Unix() > claim.ExpiresAt.Unix() {
 		log.Println("jwt token is expired: ", claim.ExpiresAt)
-		helpers.SendResponse(c, http.StatusUnauthorized, "unauthorized", nil)
+		helpers.SendResponseHTTP(ctx, http.StatusUnauthorized, "unauthorized", nil)
+		ctx.Abort()
+		return
 	}
-	c.Set("username", claim)
 
-	c.Next()
+	ctx.Set("token", claim)
 
+	ctx.Next()
 }

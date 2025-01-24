@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"ewallet-framework/cmd/proto/tokenvalidation"
 	"ewallet-framework/helpers"
 	"log"
 	"net"
@@ -10,14 +11,17 @@ import (
 )
 
 func ServerGRPC() {
+	dependency := dependencyInject()
+
+	s := grpc.NewServer()
+
+	//list method
+	tokenvalidation.RegisterTokenValidationServer(s, dependency.TokenValidation)
 	lis, err := net.Listen("tcp", ":"+helpers.GetEnv("GRPC_PORT", "7001"))
 	if err != nil {
 		log.Fatal("Failed to open grpc port: ", err)
 	}
 
-	s := grpc.NewServer()
-
-	//list method
 	//pb.ExampleMethod(s, &grpc....)
 
 	logrus.Info("GRPC Server running on port: ", helpers.GetEnv("GRPC_PORT", "7001"))

@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"ewallet-framework/external"
 	"ewallet-framework/internal/interfaces"
 	"ewallet-framework/internal/models"
 
@@ -9,7 +10,8 @@ import (
 )
 
 type RegisterService struct {
-	RegisterRepo interfaces.IUserRepository
+	RegisterRepo   interfaces.IUserRepository
+	ExternalWallet interfaces.IWallet
 }
 
 func (s *RegisterService) Register(ctx context.Context, request models.User) (interface{}, error) {
@@ -21,6 +23,13 @@ func (s *RegisterService) Register(ctx context.Context, request models.User) (in
 	request.Password = string(hashPassword)
 
 	err = s.RegisterRepo.InsertNewUser(ctx, &request)
+	if err != nil {
+		return nil, err
+	}
+
+	e := external.ExWallet{}
+	e.CreateWallet(ctx, request.ID)
+	_, err = s.ExternalWallet.CreateWallet(ctx, request.ID)
 	if err != nil {
 		return nil, err
 	}
